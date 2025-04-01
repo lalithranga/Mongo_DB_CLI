@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import AuctionItems from "./models/AuctionItems.js";
+import express from "express";
+import cors from "cors";
+import { addAuctionItem, findAuctionItem, updateAuctionItem, deleteAuctionItem } from "./controller.js";
 
 // Connect to MongoDB
 export const connectDB = async () => {
@@ -12,6 +15,77 @@ export const connectDB = async () => {
   }
 };
 
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
+app.post("/", (req, res) => {
+  const item = req.body;
+  addAuctionItem(item)
+    .then((item) => {
+      console.log("Item added:", item);
+      res.status(201).json(item);
+    })
+    .catch((err) => {
+      console.error("Error adding item:", err);
+      res.status(500).json({ error: "Error adding item" });
+    });
+});
+
+app.get("/search", (req, res) => {
+  const keywords = req.query.keywords;
+  findAuctionItem(keywords)
+    .then((items) => {
+      console.log("Items found:", items);
+      res.status(200).json(items);
+    })
+    .catch((err) => {
+      console.error("Error finding items:", err);
+      res.status(500).json({ error: "Error finding items" });
+    });
+});
+
+app.put("/update/:id", (req, res) => {  
+  const id = req.params.id;
+  const item = req.body;
+  updateAuctionItem(id, item)
+    .then((item) => {
+      if (!item) {
+        console.log("Item not found");
+        return res.status(404).json({ error: "Item not found" });
+      }
+      console.log("Item updated:", item);
+      res.status(200).json(item);
+    })
+    .catch((err) => {
+      console.error("Error updating item:", err);
+      res.status(500).json({ error: "Error updating item" });
+    }); 
+});
+
+app.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  deleteAuctionItem(id)
+    .then((item) => {
+      if (!item) {
+        console.log("Item not found");
+        return res.status(404).json({ error: "Item not found" });
+      }
+      console.log("Item deleted:", item);
+      res.status(200).json(item);
+    })
+    .catch((err) => {
+      console.error("Error deleting item:", err);
+      res.status(500).json({ error: "Error deleting item" });
+    });
+});
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+
 // Disconnect from MongoDB
 export const disconnectDB = async () => {
   try {
@@ -22,70 +96,3 @@ export const disconnectDB = async () => {
     throw err;
   }
 };
-
-// Add Auction Item
-export const addAuctionItem = (item) => {
-  return AuctionItems.create(item)
-    .then((item) => {
-      console.log("Item added:", item);
-      return item;
-    })
-    .catch((err) => {
-      console.error("Error adding item:", err);
-      throw err;
-    });
-};
-
-// Find Auction Item
-export const findAuctionItem = (keywords) => {
-  const searchTerms = keywords.split(' ').map((word) => new RegExp(word, 'i'));
-  return AuctionItems.find({ 
-    $or: [{ title: { $in: searchTerms } }, { description: { $in: searchTerms } }] 
-  })
-    .then((items) => {
-      console.log("Items found:", items);
-      console.log(`${items.length} matches`);
-      return items;
-    })
-    .catch((err) => {
-      console.error("Error finding items:", err);
-      throw err;
-    });
-};
-
-export const updateAuctionItem = async (id, item) => {
-  try {
-    const updatedItem = await AuctionItems.findByIdAndUpdate(
-      id,
-      { 
-        title: item.title,
-        description: item.description,
-        start_price: item.start_price,
-        reserve_price: item.reserve_price
-      },
-      { new: true }
-    );
-    return updatedItem;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const deleteAuctionItem = (id) => {
-  return AuctionItems.findByIdAndDelete(id)
-    .then((item) => {
-      if (!item) {
-        console.log("Item not found");
-        return null;
-      }
-      console.log("Item deleted:", item);
-      return item;
-    }
-    ).catch((err) => {
-      console.error("Error deleting item:", err);
-      throw err;
-    }); 
-};
-
-
-

@@ -1,7 +1,8 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import mongoose from 'mongoose';
-import { addAuctionItem, findAuctionItem, updateAuctionItem, deleteAuctionItem, connectDB, disconnectDB } from './index.js';
+import { addAuctionItem, findAuctionItem, updateAuctionItem, deleteAuctionItem } from './controller.js';
+import { connectDB, disconnectDB } from './index.js';
 
 const program = new Command();
 
@@ -12,7 +13,7 @@ program
 const questions = [	
   {
     type: 'input',
-    name: 'title',  // Changed from item_title
+    name: 'title',
     message: 'Enter item title:',
     validate: input => input.length >= 3 ? true : 'Title must be at least 3 characters'
   },
@@ -34,7 +35,7 @@ const questions = [
     message: 'Enter reserve price:',
     validate: (input, answers) => {
       if (input < 0) return 'Price must be non-negative';
-    
+      
       return true;
     }
   }
@@ -71,8 +72,10 @@ program
           type: 'input',
           name: 'search',
           message: 'Enter search term:',
+          validate: input => input.trim() ? true : 'Search term is required'
         }
       ]);
+      
       const items = await findAuctionItem(search);
       if (items.length === 0) {
         console.log('No items found');
