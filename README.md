@@ -249,10 +249,3 @@ Invalid ID format
 If no items are found during a search:
 ```bash
 No items found
-
-### Key Changes:
-1. **API Endpoints** section with detailed instructions on how to use the routes (`POST`, `GET`, `PUT`, `DELETE`) with an example API request.
-2. Clarified how to set up and use **MongoDB** locally with the `.env` file and configuration.
-3. Provided clear usage examples for each CLI command (`add`, `find`, `update`, `delete`).
-
-This should make it easy for you or others to set up and interact with the Auction Item Manager CLI and APIs. Let me know if you need further adjustments!
