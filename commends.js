@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import mongoose from 'mongoose';
-import { addAuctionItem, findAuctionItem, updateAuctionItem, deleteAuctionItem } from './controller.js';
+import { addAuctionItem, findAuctionItem, updateAuctionItem, deleteAuctionItem, getAllItems } from './controller.js';
 import { connectDB, disconnectDB } from './index.js';
 
 const program = new Command();
@@ -140,6 +140,39 @@ program
       process.exit(0);
     } catch (error) {
       console.error('Error deleting item:', error.message);
+      await disconnectDB();
+      process.exit(1);
+    }
+  });
+
+program
+  .command('getall')
+  .alias('g')
+  .description('Get all auction items')
+  .action(async () => {
+    try {
+      await connectDB();
+      const items = await getAllItems();
+      
+      if (items.length === 0) {
+        console.log('No items found in the database');
+      } else {
+        console.log('All auction items:');
+        items.forEach(item => {
+          console.log('\n-------------------');
+          console.log(`ID: ${item._id}`);
+          console.log(`Title: ${item.title}`);
+          console.log(`Description: ${item.description}`);
+          console.log(`Start Price: ${item.start_price}`);
+          console.log(`Reserve Price: ${item.reserve_price}`);
+        });
+        console.log(`\nTotal items: ${items.length}`);
+      }
+      
+      await disconnectDB();
+      process.exit(0);
+    } catch (error) {
+      console.error('Error getting items:', error.message);
       await disconnectDB();
       process.exit(1);
     }

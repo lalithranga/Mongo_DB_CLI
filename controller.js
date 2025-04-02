@@ -1,5 +1,6 @@
 import AuctionItems from "./models/AuctionItems.js";
 
+
 export const addAuctionItem = (item) => {
   return AuctionItems.create(item)
     .then((item) => {
@@ -60,4 +61,16 @@ export const deleteAuctionItem = (id) => {
       console.error("Error deleting item:", err);
       throw err;
     }); 
+};
+
+export const getAllItems = () => {
+  return AuctionItems.find({})
+    .then((items) => {
+      console.log(`Found ${items.length} items`);
+      return items;
+    })
+    .catch((err) => {
+      console.error("Error getting all items:", err);
+      throw err;
+    });
 };

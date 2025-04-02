@@ -4,18 +4,20 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "commander": "^13.1.0",   
+    "commander": "^13.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "inquirer": "^12.5.0",
-    "mongoose": "^8.13.1"
+    "mongoose": "^8.13.1",
+    "nodemon": "^3.1.9"
   }
 }
